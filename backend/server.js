@@ -4,14 +4,14 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const locationsRouter = require('./routes/locations.js');
-
+const businessRoutes = require('./routes/business');
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 
-
+app.use('/api/business', businessRoutes);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB');
