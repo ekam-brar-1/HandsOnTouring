@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
@@ -165,10 +166,17 @@ function SubscriptionScreen({ onSubscribed }: SubscriptionProps) {
     if (!user?.id) return;
     setProcessing(true);
     try {
-      await axios.post(
-        `${BASE_URL}/api/business/subscribe`,
-        { userId: user.id }
-      );
+      const response = await axios.post(`${BASE_URL}/api/stripe/create-subscription`, {
+        email: user.email,
+        userId: user.id,
+      });
+      
+      if (response.data.url) {
+        await WebBrowser.openBrowserAsync(response.data.url);
+      } else {
+        alert('Could not get checkout URL');
+      }
+      
       onSubscribed();
     } catch (err) {
       console.error('Subscribe error:', err);

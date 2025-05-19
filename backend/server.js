@@ -36,9 +36,9 @@ const favoriteRoutes = require('./routes/favorites');
 
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);
-
+app.use('/api/stripe', stripeRoutes);
 app.use('/api/locations', locationsRouter);
-
+app.use(bodyParser.json());
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {

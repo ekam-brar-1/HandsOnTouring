@@ -9,12 +9,14 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@stripe/stripe-react-native": "^0.46.0",
     "@supabase/realtime-js": "^2.11.8-next.1",
     "@supabase/supabase-js": "^2.49.5-next.1",
     "axios": "^1.9.0",
     "expo": "~53.0.9",
     "expo-router": "^5.0.7",
     "expo-status-bar": "~2.2.3",
+    "expo-web-browser": "~14.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
