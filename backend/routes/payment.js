@@ -1,6 +1,7 @@
-import express from "express";
-import Stripe from "stripe";
+const express = require("express");
+const Stripe = require("stripe");
 const router = express.Router();
+
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
 router.post("/create-subscription", async (req, res) => {
@@ -41,4 +42,4 @@ router.post("/create-subscription", async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const Stripe = require('stripe');
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET, {
   apiVersion: '2023-10-16',
 });
 
@@ -46,4 +46,3 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 });
 
 module.exports = router;
-f

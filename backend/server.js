@@ -5,8 +5,15 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const locationsRouter = require('./routes/locations.js');
 const businessRoutes = require('./routes/business');
+const stripeRoutes = require('./routes/stripe');
+const subscriptionRoutes = require('./routes/payment'); // assuming your file is routes/stripe.js
+const bodyParser = require('body-parser');
 const app = express();
+app.use('/api/stripe', stripeRoutes);
 app.use(express.json());
+
+app.use('/api/stripe', subscriptionRoutes); 
+
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
@@ -36,7 +43,7 @@ const favoriteRoutes = require('./routes/favorites');
 
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);
-app.use('/api/stripe', stripeRoutes);
+
 app.use('/api/locations', locationsRouter);
 app.use(bodyParser.json());
 app.post("/register", async (req, res) => {
