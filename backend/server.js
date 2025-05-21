@@ -8,6 +8,10 @@ const businessRoutes = require('./routes/business');
 const stripeRoutes = require('./routes/stripe');
 const subscriptionRoutes = require('./routes/payment'); // assuming your file is routes/stripe.js
 const bodyParser = require('body-parser');
+const azureRoutes = require('./routes/azure');
+const eventsRoutes = require('./routes/events');
+
+
 const app = express();
 app.use('/api/stripe', stripeRoutes);
 app.use(express.json());
@@ -43,8 +47,10 @@ const favoriteRoutes = require('./routes/favorites');
 
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);
-
+app.use('/api/azure', azureRoutes);
 app.use('/api/locations', locationsRouter);
+app.use('/api/events', eventsRoutes);
+
 app.use(bodyParser.json());
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
