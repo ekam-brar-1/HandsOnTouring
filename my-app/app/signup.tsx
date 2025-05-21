@@ -36,7 +36,7 @@ export default function SignupScreen() {
       const response = await fetch(`http://${process.env.EXPO_PUBLIC_IPV4}:5000/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({id: user.id, name, email, password }),
       });
       const data = await response.json();
       console.log(data);
@@ -45,11 +45,50 @@ export default function SignupScreen() {
     }
   };
 
-  const handleSignup3 = () => {
-    handleSignup();
-    handleSignup2();
+  const handleSignup3 = async () => {
+    if (!name || !email || !password || password !== confirmPassword) {
+      Alert.alert("Invalid input");
+      return;
+    }
+  
+    const { data, error } = await supabase.auth.signUp({ email, password });
+  
+    if (error) {
+      Alert.alert("Error Signing Up", error.message);
+      return;
+    }
+  
+    const userId = data?.user?.id;
+  
+    if (!userId) {
+      Alert.alert("Signup failed", "No user ID returned.");
+      return;
+    }
+  
+    // register in your backend
+    try {
+      const response = await fetch(`http://${process.env.EXPO_PUBLIC_IPV4}:5000/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: userId,
+          name,
+          email,
+          password
+        }),
+      });
+      const json = await response.json();
+      console.log("Backend response:", json);
+  
+      Alert.alert("Success", "Registered successfully!", [
+        { text: "OK", onPress: () => router.replace("/(tabs)") },
+      ]);
+    } catch (err) {
+      console.log("Backend error:", err);
+      Alert.alert("Backend registration failed.");
+    }
   };
-
+  
   return (
     <View style={styles.container}>
       <Pressable style={styles.backButton} onPress={() => router.push("/login")}>

@@ -10,6 +10,7 @@ const subscriptionRoutes = require('./routes/payment'); // assuming your file is
 const bodyParser = require('body-parser');
 const azureRoutes = require('./routes/azure');
 const eventsRoutes = require('./routes/events');
+const usersRoutes = require('./routes/users');
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/stripe', subscriptionRoutes);
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
+app.use('/api/users', usersRoutes);
 
 app.use('/api/business', businessRoutes);
 mongoose.connect(process.env.MONGO_URI)
@@ -35,12 +37,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-});
-const User = mongoose.model("User", userSchema);
+  const User = require('./models/User');
 
 const reviewRoutes = require('./routes/reviews');
 const favoriteRoutes = require('./routes/favorites');
@@ -53,10 +50,10 @@ app.use('/api/events', eventsRoutes);
 
 app.use(bodyParser.json());
 app.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const {id, name, email, password } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword });
+    const user = new User({_id:id, name, email, password: hashedPassword });
     await user.save();
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
