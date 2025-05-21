@@ -28,13 +28,14 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   // Handle the successful subscription
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
+    const userId = session.metadata?.userId;
     const customerId = session.customer;
 
     try {
       // Example DB update (customize based on your DB system)
-      await db.users.updateOne(
-        { stripe_customer_id: customerId },
-        { $set: { is_subscribed: true } }
+      await db.collection('businesses').updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { is_subscribed: true, stripe_customer_id: customerId } }
       );
       console.log('✅ Subscription recorded for customer:', customerId);
     } catch (dbErr) {

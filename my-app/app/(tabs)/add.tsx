@@ -12,7 +12,7 @@ import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
-
+import AddEventScreen from '../components/addevent';
 // Configure this to your backend URL (development or production)
 const BASE_URL = `http://${process.env.EXPO_PUBLIC_IPV4}:5000`;
 
@@ -209,14 +209,14 @@ function SubscriptionScreen({ onSubscribed }: SubscriptionProps) {
   );
 }
 
-function AddEventScreen() {
-  return (
-    <View style={styles.center}>
-      <Text style={styles.header}>Add Your Event</Text>
-      {/* TODO: navigate to your event creation form */}
-    </View>
-  );
-}
+// function AddEventScreen() {
+//   return (
+//     <View style={styles.center}>
+//       <Text style={styles.header}>Add Your Event</Text>
+//       {/* TODO: navigate to your event creation form */}
+//     </View>
+//   );
+// }
 
 const styles = StyleSheet.create({
   center: {

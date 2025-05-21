@@ -5,7 +5,7 @@ const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
 router.post("/create-subscription", async (req, res) => {
-  const { email, customerId } = req.body;
+  const { email, customerId, userId } = req.body;
 
   try {
     let customer = customerId;
@@ -31,6 +31,9 @@ router.post("/create-subscription", async (req, res) => {
           quantity: 1,
         },
       ],
+      metadata: {
+        userId, // ✅ this lets us identify the user in the webhook
+      },
       success_url: `${process.env.FRONTEND_URL}/subscription-success`,
       cancel_url: `${process.env.FRONTEND_URL}/subscription-cancelled`,
     });
