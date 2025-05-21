@@ -1,8 +1,10 @@
-// --- React Native User Profile Page ---
+// --- React Native Profile Page with Design ---
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch, Alert } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 const BASE_URL = `http://${process.env.EXPO_PUBLIC_IPV4}:5000`;
 
@@ -15,9 +17,10 @@ interface UserData {
 }
 
 export default function ProfileScreen() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -27,54 +30,86 @@ export default function ProfileScreen() {
       .finally(() => setLoading(false));
   }, [user]);
 
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handleToggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   if (loading) {
-    return <View style={styles.center}><ActivityIndicator size="large" /></View>;
+    return <View style={styles.center}><Text>Loading...</Text></View>;
   }
 
   if (!userData) {
-    return <View style={styles.center}><Text>Unable to load user profile.</Text></View>;
+    return <View style={styles.center}><Text>User not found.</Text></View>;
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Profile</Text>
-      <View style={styles.card}>
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{userData.name}</Text>
-
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{userData.email}</Text>
-
-        {userData.stripe_customer_id && (
-          <>
-            <Text style={styles.label}>Stripe ID:</Text>
-            <Text style={styles.value}>{userData.stripe_customer_id}</Text>
-          </>
-        )}
-
-        <Text style={styles.label}>Subscription:</Text>
-        <Text style={styles.value}>{userData.is_subscribed ? 'Active' : 'Inactive'}</Text>
-
-        {userData.createdAt && (
-          <>
-            <Text style={styles.label}>Joined:</Text>
-            <Text style={styles.value}>{new Date(userData.createdAt).toLocaleDateString()}</Text>
-          </>
-        )}
+      <View style={styles.profileCard}>
+        <Image source={{ uri: 'https://api.dicebear.com/7.x/thumbs/svg?seed=profile' }} style={styles.avatar} />
+        <Text style={styles.profileName}>{userData.name}</Text>
+        <Text style={styles.profileUsername}>@{userData.email.split('@')[0]}</Text>
       </View>
 
-      <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Edit Profile</Text></TouchableOpacity>
+      <View style={styles.section}>
+        <MenuItem icon={<Ionicons name="person-outline" size={20} color="#6B46C1" />} label="My Account" sub="Make changes to your account" hasAlert onPress={() => router.push('/account/EditAccount')} />
+        <MenuItem icon={<MaterialIcons name="favorite-border" size={20} color="#6B46C1" />} label="Favorites" sub="Manage Favorites" onPress={() => router.push('/account/Favorites')}
+ />
+        <MenuItem
+          icon={<Feather name="moon" size={20} color="#6B46C1" />}
+          label="Dark Mode"
+          switchToggle
+          switchValue={darkMode}
+          onSwitchToggle={handleToggleDarkMode}
+        />
+        <MenuItem icon={<Feather name="globe" size={20} color="#6B46C1" />} label="Language" onPress={() => Alert.alert('Language Settings')} />
+        <MenuItem icon={<Feather name="log-out" size={20} color="#6B46C1" />} label="Log out" onPress={handleLogout} />
+      </View>
+
+      <View style={styles.section}>
+        <MenuItem icon={<Ionicons name="help-circle-outline" size={20} color="#6B46C1" />} label="Support" sub="Contact Support" onPress={() => Alert.alert('Support')} />
+      </View>
     </ScrollView>
+  );
+}
+
+function MenuItem({ icon, label, sub, hasAlert = false, onPress, switchToggle = false, switchValue = false, onSwitchToggle }: any) {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.menuItem}>
+      <View style={styles.menuLeft}>
+        {icon}
+        <View style={{ marginLeft: 12 }}>
+          <Text style={styles.menuLabel}>{label}</Text>
+          {sub && <Text style={styles.menuSub}>{sub}</Text>}
+        </View>
+      </View>
+      {switchToggle ? (
+        <Switch value={switchValue} onValueChange={onSwitchToggle} />
+      ) : (
+        <View style={styles.menuRight}>
+          {hasAlert && <View style={styles.alertDot} />}
+          <Feather name="chevron-right" size={18} color="#aaa" />
+        </View>
+      )}
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: { padding: 20 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
-  card: { backgroundColor: '#f4f4f4', padding: 16, borderRadius: 8, marginBottom: 20 },
-  label: { fontWeight: '600', color: '#444' },
-  value: { marginBottom: 12, fontSize: 16 },
-  button: { backgroundColor: '#6B46C1', padding: 12, borderRadius: 6 },
-  buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' }
+  profileCard: { alignItems: 'center', marginBottom: 20 },
+  avatar: { width: 80, height: 80, borderRadius: 40, marginBottom: 8 },
+  profileName: { fontSize: 18, fontWeight: 'bold' },
+  profileUsername: { color: '#888' },
+  section: { backgroundColor: '#f9f9f9', borderRadius: 10, marginVertical: 10, padding: 8 },
+  menuItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 8 },
+  menuLeft: { flexDirection: 'row', alignItems: 'center' },
+  menuLabel: { fontSize: 16, fontWeight: '500' },
+  menuSub: { fontSize: 12, color: '#777' },
+  menuRight: { flexDirection: 'row', alignItems: 'center' },
+  alertDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'red', marginRight: 6 }
 });
